@@ -10,11 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
 
-    "start": "node index.js",
-    "build": "cd frontend && npm run build",
-    "install-frontend": "cd frontend && npm install",
-    "heroku-postbuild": "npm run install-frontend && npm run build",
-    "frontend": "cd frontend && npm start"
+    
+    "start": "cd frontend && npm start"
    
      },
   "keywords": [],
