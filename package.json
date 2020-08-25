@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build --prefix ./frontend",
+    "build": "cd frontend && npm run build",
     "start": "node index.js",
-    "install":"npm install --prefix ./frontend",
+    "install":"cd frontend && npm install",
     "build2":"cd frontend && npm run build"
     
      },
