@@ -8,7 +8,7 @@ if(process.env.NODE_ENV === 'production'){
     app.use(express.static(path.join(__dirname, "frontend", "build")))
     app.get('*', (req,res)=>{
         res.sendFile(path.join(__dirname, "frontend", "build", "index.html"))
-        let files = fs.readdirSync(path.join(__dirname, "frontend"))
+        let files = fs.readdirSync(path.join(__dirname, ".."))
         console.log("my files are " + files)
     })
     
