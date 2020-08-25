@@ -5,11 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd frontend && npm run build",
+    "build": "npm run build --prefix ./frontend",
     "start": "node index.js",
-    "install":"cd frontend && npm install",
-    "build2":"cd frontend && npm run build"
-    
+    "install":"npm install --prefix ./frontend"    
      },
   "keywords": [],
   "author": "",
