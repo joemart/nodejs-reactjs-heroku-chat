@@ -15,8 +15,6 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
-
-
 io.on('connect', socket =>{
     socket.on('message', ({name,msg}) =>{
         io.emit('message', {name,msg})
