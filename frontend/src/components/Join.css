@@ -1,0 +1,30 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+.OuterContainer{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    height:100vh;
+    background: #44a8ff;
+}
+
+.InnerContainer{
+    width:30%;
+    border: 2px solid rgb(255, 255, 255);
+
+    display: flex;
+    flex-direction: column;
+
+}
+
+.heading,
+input,
+button{
+    width: 100%;
+    padding: 10px 20px;
+    text-align:center;   
+}
