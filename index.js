@@ -14,5 +14,22 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
+io.on('connect', socket =>{
+    socket.on('message', ({name,msg}) =>{
+        io.emit('message', {name,msg})
+    })
+    
+    socket.on('new-user', (name)=>{
+        users[socket.id] = name
+        io.emit('new-user', users[socket.id])
+    })
+
+    socket.on('disconnect', ()=>{
+        if(users[socket.id])
+        console.log(users[socket.id] +' dc!')
+        delete users[socket.id]
+    })
+})
+
 
 http.listen(port)
