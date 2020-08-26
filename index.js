@@ -15,6 +15,11 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
+io.configure(function () { 
+    io.set("transports", ["xhr-polling"]); 
+    io.set("polling duration", 10); 
+  });
+
 io.on('connect', socket =>{
     socket.on('message', ({name,msg}) =>{
         io.emit('message', {name,msg})
