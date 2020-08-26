@@ -1,11 +1,10 @@
 const express = require('express')
 const app = express()
 const path = require('path')
-const port = process.env.PORT || 5000
 const http = require('http').createServer(app)
-const io = require('socket.io').listen(http)
+const io = require('socket.io')(http)
 
-
+const port = process.env.PORT || 5000
 let users = {}
 
 if(process.env.NODE_ENV === 'production'){

@@ -12,7 +12,7 @@
     "start": "node index.js",
 
     "install-frontend": "cd frontend && npm install",
-    "heroku-postbuild": "cd ./frontend && npm install && npm run build",
+    "heroku-postbuild": "npm install --prefix ./frontend && npm run build --prefix ./frontend",
     "frontend": "cd frontend && npm start"
   },
   "keywords": [],
