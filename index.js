@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const path = require('path')
 const port = 5000
+const io = require('socket.io')
 
 
 if(process.env.NODE_ENV === 'production'){
