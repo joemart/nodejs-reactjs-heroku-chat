@@ -4,7 +4,7 @@ const path = require('path')
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 4000
 let users = {}
 
 if(process.env.NODE_ENV === 'production'){
@@ -15,10 +15,7 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
-io.configure(function () { 
-    io.set("transports", ["xhr-polling"]); 
-    io.set("polling duration", 10); 
-  });
+
 
 io.on('connect', socket =>{
     socket.on('message', ({name,msg}) =>{
