@@ -6,7 +6,7 @@ export default({user})=>{
     const [chat, setChat] = useState([])
     const [data, setData] = useState({name: user, msg:'' })
     const socketRef = useRef()
-    const [socketURL] = useState(()=>{if(process.env.NODE_ENV === "production")return "/"; else return 'http://localhost:4000'})
+    const [socketURL] = useState(()=>((process.env.NODE_ENV === "production") ? "/": 'http://localhost:4000'))
 
 
     useEffect(()=>{
