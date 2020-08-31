@@ -16,7 +16,6 @@ export default({user})=>{
 
     useEffect(()=>{
         socketRef.current = io.connect(socketURL)
-
         socketRef.current.on('new-user', name =>{
             receivedMessages(name + " has connected!")
         })
