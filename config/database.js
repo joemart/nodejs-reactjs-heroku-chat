@@ -2,7 +2,8 @@ require('dotenv').config({path:"../"})
 const mongoose = require('mongoose')
 const conn = process.env.MONGODB_URI
 // const conn = process.env.MONGODB_LOCAL
-const options = {    useNewUrlParser: true, 
+const options = {    
+    useNewUrlParser: true, 
     useUnifiedTopology: true, 
     useFindAndModify: false}
 const connection = mongoose.createConnection(conn, options)
