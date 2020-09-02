@@ -8,6 +8,9 @@ export default({user})=>{
     const socketRef = useRef()
     const [socketURL] = useState(()=>{if(process.env.NODE_ENV === "production")return "/"; else return 'http://localhost:4000'})
 
+    let refreshPage = ()=>{
+        window.location.reload(false)
+    }
 
     useEffect(()=>{
         socketRef.current = io.connect(socketURL)
@@ -15,30 +18,35 @@ export default({user})=>{
     },[user])
 
     useEffect(()=>{
+        socketRef.current.on('error', ()=>refreshPage())
         socketRef.current = io.connect(socketURL)
         socketRef.current.on('new-user', name =>{
-            receivedMessages(name + " has connected!")
+            console.log('client connected')
+            //displays the message by 'n' amount of users
+            socketRef.current.emit('message', {name, msg:" has connected!"})
+
+        })
+        socketRef.current.on('disconnect', name =>{
+            //on disconnect chat is not a function error
+            console.log(name, ' disconnected')
+            socketRef.current.emit('message', {name, msg:" has disconnected!"})
+
         })
 
-        socketRef.current.on('message', ({name, msg})=>{
-            receivedMessages({name, msg})
+        socketRef.current.on('message', ({messages})=>{
+            setChat(messages)
         })
 
-        
     },[])
 
-    const receivedMessages = (message) =>{
-        setChat(oldchat=>[...oldchat, message])
-    }
 
     const renderChat = () =>{
+        console.log("before chat")
+        const userChat = (d,i) => (<div key={i}> {d.data.name} : {d.data.message} </div>)
 
-        const userChat = (data,i) => (<div key={i}> {data.name} : {data.msg} </div>)
-        const user = (data,i) => (<div key={i}> {data } </div>)
+        return  chat.map( (d, i) => {
 
-        return  chat.map( (data, i) => {
-
-        return typeof(data) == 'object' ? userChat(data,i) : user(data,i)
+        return userChat(d,i)
             })
     }
 
@@ -52,7 +60,6 @@ export default({user})=>{
     const chatForm = () =>{
 
         return   <div className="card">
-            {console.log(chat)}
                 <form onSubmit={handleSubmitButton}>
                     <h1>Messenger</h1>
                     <div className="name-field">

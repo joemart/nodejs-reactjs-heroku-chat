@@ -17,23 +17,51 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
-io.on('connect', socket =>{
-    socket.on('message', ({name,msg}) =>{
-        User.
-        io.emit('message', {name,msg})
-    })
-    
-    socket.on('new-user', (name)=>{
-        users[socket.id] = name
-        io.emit('new-user', users[socket.id])
-    })
+    Chat.create({messages:[]})
+    .then(c=>{
+        io.on('connect', socket =>{
+            console.log('connected socket')
+            socket.on('message', ({name,msg}) =>{
+                console.log(name, msg)
+                Chat.findByIdAndUpdate(
+                    {_id:c._id}, 
+                    {$push:{messages:{data:{message:msg, name:name}}}}, 
+                    {new:true})
+                .then(chat=>{
+                    // console.log(chat)
+                    io.emit('message', chat)
+                })
+                .catch(e=>console.log(e))
+                // io.emit('message', {name,msg})
+                })
 
-    socket.on('disconnect', ()=>{
-        if(users[socket.id])
-        console.log(users[socket.id] +' dc!')
-        delete users[socket.id]
+                
+            socket.on('new-user', (name)=>{
+                //implement password auth
+                User.findOne({user:name})
+                .then(u=>{
+                    if(!u){
+                        users[socket.id] = name    
+                        User.create({user:name, chat:c._id})
+                        io.emit('new-user', users[socket.id])
+                        console.log('new user')
+                         }
+                    else
+                        io.emit('error', 'User taken!')
+                      })
+                })
+
+            socket.on('disconnect', ()=>{
+                if(users[socket.id])
+                console.log(users[socket.id] +' dc!')
+                // io.emit('message', ({name: users[socket.id]}))
+                delete users[socket.id]
+                })
+        })
     })
-})
+    .catch(e=>console.log(e))
+
+
 
 
 http.listen(port)

@@ -1,4 +1,7 @@
 module.exports = (connection, mongoose) => connection.model('Chat', 
 new mongoose.Schema({
-    messages:[String]
+    messages:[{ 
+        data:{message:String, name:String}, 
+        created: {type:Date, default:Date.now}
+    }]
 }))
