@@ -2,6 +2,7 @@ require('dotenv').config({path:"../"})
 const mongoose = require('mongoose')
 const conn = process.env.MONGODB_URI
 // const conn = process.env.MONGODB_LOCAL
+console.log(conn)
 const options = {    
     useNewUrlParser: true, 
     useCreateIndex: true,

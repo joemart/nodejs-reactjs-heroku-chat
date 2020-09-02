@@ -5,7 +5,9 @@ const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 const {User, Chat} = require('./config/index').models
 
-
+//heroku run printenv
+//heroku run node
+//console.log(process.env)
 const port = process.env.PORT || 4000
 let users = {}
 
