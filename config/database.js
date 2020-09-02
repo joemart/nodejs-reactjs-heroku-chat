@@ -4,6 +4,7 @@ const conn = process.env.MONGODB_URI
 // const conn = process.env.MONGODB_LOCAL
 const options = {    
     useNewUrlParser: true, 
+    useCreateIndex: true,
     useUnifiedTopology: true, 
     useFindAndModify: false}
 const connection = mongoose.createConnection(conn, options)

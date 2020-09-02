@@ -17,6 +17,8 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
+app.use(express.urlencoded({extended: false}))
+
     Chat.create({messages:[]})
     .then(c=>{
         io.on('connect', socket =>{
