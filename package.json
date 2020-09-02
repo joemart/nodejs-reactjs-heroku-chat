@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "client": "npm run start --prefix ./frontend",
-    "devStart":"nodemon index.js",
+    "devStart": "nodemon index.js",
     "dev": "concurrently \"npm run devStart\" \"npm run client\"",
     "heroku-postbuild": "npm install --prefix ./frontend && npm run build --prefix ./frontend"
   },
@@ -25,6 +25,7 @@
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
+    "dotenv": "^8.2.0",
     "nodemon": "^2.0.4"
   }
 }
