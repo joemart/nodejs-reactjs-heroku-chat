@@ -65,7 +65,15 @@ if(process.env.NODE_ENV === 'production'){
                                 if(!u){
                                     users[socket.id] = name    
                                     User.create({user:name, chat:c._id})
-                                    io.emit('new-user', users[socket.id])
+                                    Chat.findByIdAndUpdate(
+                                        {_id:c._id}, 
+                                        {$push:{messages:{data:{message:" has connected!", name:name}}}}, 
+                                        {new:true})
+                                    .then(chat=>{
+                                        io.emit('message', chat)
+                                    })
+                                    .catch(e=>console.log(e))
+                                    // io.emit('new-user', users[socket.id])
                                     console.log('new user')
                                     }
                                 else
@@ -79,7 +87,15 @@ if(process.env.NODE_ENV === 'production'){
                         */
                         socket.on('disconnect', ()=>{
                             if(users[socket.id])
-                            io.emit('disconnect', (users[socket.id]))
+                            Chat.findByIdAndUpdate(
+                                {_id:c._id}, 
+                                {$push:{messages:{data:{message:" has disconnected!", name:users[socket.id]}}}}, 
+                                {new:true})
+                            .then(chat=>{
+                                io.emit('message', chat)
+                            })
+                            .catch(e=>console.log(e))
+                            // io.emit('disconnect', (users[socket.id]))
                             delete users[socket.id]
                             })
                     })
