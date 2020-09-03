@@ -12,36 +12,33 @@ export default({user})=>{
         window.location.reload(false)
     }
 
+    // useEffect(()=>{
+        
+    // },[user])
+
     useEffect(()=>{
         socketRef.current = io.connect(socketURL)
         socketRef.current.emit('new-user', user)
-    },[user])
 
-    useEffect(()=>{
         socketRef.current.on('error', ()=>refreshPage())
         socketRef.current = io.connect(socketURL)
         socketRef.current.on('new-user', name =>{
-            console.log('client connected')
             //displays the message by 'n' amount of users
             socketRef.current.emit('message', {name, msg:" has connected!"})
-
         })
         socketRef.current.on('disconnect', name =>{
-            //on disconnect chat is not a function error
-            console.log(name, ' disconnected')
-            socketRef.current.emit('message', {name, msg:" has disconnected!"})
-
+            socketRef.current.emit('message', {name:name, msg:" has disconnected!"})
         })
 
         socketRef.current.on('message', ({messages})=>{
             setChat(messages)
         })
 
+    
     },[])
 
 
     const renderChat = () =>{
-        console.log("before chat")
         const userChat = (d,i) => (<div key={i}> {d.data.name} : {d.data.message} </div>)
 
         return  chat.map( (d, i) => {
