@@ -8,13 +8,11 @@ export default ({login}) =>{
     const [name, setName] = useState('')
 
     const onSubmitButton = e =>{
-        
         e.preventDefault()
         login(name)
-
     }
 
-    return <> 
+    return <>
     <form className="OuterContainer" onSubmit={onSubmitButton}>
         <div className="InnerContainer">
             <div className="heading">Join us</div>

@@ -5,35 +5,33 @@ export default({user})=>{
 
     const [chat, setChat] = useState([])
     const [data, setData] = useState({name: user, msg:'' })
+    const [usersLogged, setUsersLogged] = useState({})
     const socketRef = useRef()
     const [socketURL] = useState(()=>((process.env.NODE_ENV === "production") ? "/": 'http://localhost:4000'))
+
 
     let refreshPage = ()=>{
         window.location.reload(false)
     }
-
-    // useEffect(()=>{
-        
-    // },[user])
 
     useEffect(()=>{
         socketRef.current = io.connect(socketURL)
         socketRef.current.emit('new-user', user)
         socketRef.current.on('error', ()=>refreshPage())
         socketRef.current.on('message', ({messages})=>{
-            setChat(messages)
+        setChat(messages)
         })
-    },[])
+        socketRef.current.on('users-logged-in', (users)=> setUsersLogged({...users}))
+    },[setChat,setData,setUsersLogged,socketURL])
 
 
     const renderChat = () =>{
         const userChat = (d,i) => (<div key={i}> {d.data.name} : {d.data.message} </div>)
-
         return  chat.map( (d, i) => {
-
         return userChat(d,i)
             })
     }
+
 
     const handleSubmitButton = (e) =>{
         e.preventDefault()
@@ -62,6 +60,13 @@ export default({user})=>{
         }
 
     return <>
+    
+    <div>
+        {Object.values(usersLogged).map(u=>{
+        return <a href={`${socketURL}/1234`}>{u}</a>
+        })}
+    </div>
+        
         {chatForm()}
         {renderChat()}
      </>

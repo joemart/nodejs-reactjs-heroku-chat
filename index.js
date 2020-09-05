@@ -4,7 +4,10 @@ const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 const {User, Chat} = require('./config/index').models
+const fs = require('fs')
+const { json } = require('express')
 
+app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 //heroku run printenv
@@ -23,7 +26,35 @@ if(process.env.NODE_ENV === 'production'){
     
 }
 
+    var cache = [];
 
+        JSON.safeStringify = (obj, indent = 2) => {
+            let cache = [];
+            const retVal = JSON.stringify(
+              obj,
+              (key, value) =>
+                typeof value === "object" && value !== null
+                  ? cache.includes(value)
+                    ? undefined // Duplicate reference found, discard key
+                    : cache.push(value) && value // Store value in our collection
+                  : value,
+              indent
+            );
+            cache = null;
+            return retVal;
+          };
+    
+   
+
+app.use((req,res,next)=>{
+    if(req.originalUrl == '/favicon.ico')
+    return res.status(204).json({nope:true})
+    return next()
+})
+
+app.get('/:room',(req,res)=>{
+    res.status(200).json({success:true})
+})
 
     /*
     *Runs sockets on the c._id given
@@ -71,6 +102,7 @@ if(process.env.NODE_ENV === 'production'){
                                         {new:true})
                                     .then(chat=>{
                                         io.emit('message', chat)
+                                        io.emit('users-logged-in', users)
                                     })
                                     .catch(e=>console.log(e))
                                     // io.emit('new-user', users[socket.id])
@@ -93,6 +125,7 @@ if(process.env.NODE_ENV === 'production'){
                                 {new:true})
                             .then(chat=>{
                                 io.emit('message', chat)
+                                io.emit('users-logged-in', users)
                             })
                             .catch(e=>console.log(e))
                             // io.emit('disconnect', (users[socket.id]))
@@ -113,7 +146,6 @@ if(process.env.NODE_ENV === 'production'){
             Chat.create({messages:[]})
             .then(ch=> {
                 c = ch._id
-                
                 runSockets(c)
             })
         }
@@ -121,7 +153,6 @@ if(process.env.NODE_ENV === 'production'){
         //execute code here
         else {
                 c = chat._id
-
                 runSockets(c)
         }
     })
