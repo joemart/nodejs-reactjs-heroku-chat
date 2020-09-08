@@ -3,9 +3,7 @@ const path = require('path')
 const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
-const {User, Chat} = require('./config/index').models
-const fs = require('fs')
-const { json } = require('express')
+const {User, Chat, Room} = require('./config/index').models
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
@@ -52,7 +50,24 @@ app.use((req,res,next)=>{
     return next()
 })
 
-app.get('/:room',(req,res)=>{
+/*
+Receives 2 users
+looks up in the DB if the users have a room
+create one if they don't have a room
+
+Send 2 users, redirect to a new room if exists
+
+@param {String} user1 - name of the first user
+@param {String} user2 - name of the second user
+
+*/
+
+app.get('/room',(req,res)=>{
+    //check if room exists, redirect to room
+    // Room.findOne({})
+    //check if users exist
+
+
     res.status(200).json({success:true})
 })
 
@@ -60,8 +75,6 @@ app.get('/:room',(req,res)=>{
     *Runs sockets on the c._id given
     *@param c {ObjectId} Id given by mongoDB
     */
-
-
     let runSockets = c => {
             io.on('connect', socket =>{
 
@@ -95,7 +108,7 @@ app.get('/:room',(req,res)=>{
                             .then(u=>{
                                 if(!u){
                                     users[socket.id] = name    
-                                    User.create({user:name, chat:c._id})
+                                    User.create({user:name})
                                     Chat.findByIdAndUpdate(
                                         {_id:c._id}, 
                                         {$push:{messages:{data:{message:" has connected!", name:name}}}}, 
@@ -134,25 +147,29 @@ app.get('/:room',(req,res)=>{
                     })
                 
     }
+
+    //Create general room
+
     //Save id of chat on variable
     let c
-    Chat.findOne({})
-    .then(chat => {
+    Room.findOne({status: "General"}).populate("chatId")
+    .then(room => {
 
-        //if chat id isn't found
-        //create a new chat
-        if(!chat)
+        //if room id isn't found
+        //create a new room
+        if(!room)
         {
             Chat.create({messages:[]})
             .then(ch=> {
+                Room.create({chatId:ch._id, status:"General"})
                 c = ch._id
                 runSockets(c)
             })
         }
-        //if chat is found
+        //if room is found
         //execute code here
         else {
-                c = chat._id
+                c = room.chatId._id
                 runSockets(c)
         }
     })

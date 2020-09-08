@@ -9,12 +9,12 @@ export default({user})=>{
     const socketRef = useRef()
     const [socketURL] = useState(()=>((process.env.NODE_ENV === "production") ? "/": 'http://localhost:4000'))
 
-
     let refreshPage = ()=>{
         window.location.reload(false)
     }
 
     useEffect(()=>{
+
         socketRef.current = io.connect(socketURL)
         socketRef.current.emit('new-user', user)
         socketRef.current.on('error', ()=>refreshPage())
@@ -22,6 +22,10 @@ export default({user})=>{
         setChat(messages)
         })
         socketRef.current.on('users-logged-in', (users)=> setUsersLogged({...users}))
+        return () => {
+            socketRef.current.emit('disconnect')
+            socketRef.current.off()
+        }
     },[setChat,setData,setUsersLogged,socketURL])
 
 
@@ -59,12 +63,28 @@ export default({user})=>{
             </div>
         }
 
+    const returnSocket = (socket)=>{
+        console.log(socket)
+    }
+
     return <>
     
     <div>
-        {Object.values(usersLogged).map(u=>{
-        return <a href={`${socketURL}/1234`}>{u}</a>
+
+        
+        {/* Need to select the 'this' hook to add it to the parameters */}
+        {Object.keys(usersLogged).map((u,i)=>{
+            // console.log(usersLogged)
+            if(u !== socketRef.current.id)
+            return <a 
+            key={i} 
+            href={`${socketURL}/room?user1=${usersLogged[u]}&user2=${usersLogged[socketRef.current.id]}`}>{usersLogged[u]}
+            </a>
         })}
+      
+        
+        <button onClick={()=>returnSocket(socketRef.current)}>Return socket</button>
+
     </div>
         
         {chatForm()}
