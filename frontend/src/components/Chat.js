@@ -8,6 +8,7 @@ export default({user})=>{
     const [usersLogged, setUsersLogged] = useState({})
     const socketRef = useRef()
     const [socketURL] = useState(()=>((process.env.NODE_ENV === "production") ? "/": 'http://localhost:4000'))
+    const [room, setRoom] = useState('General')
 
     let refreshPage = ()=>{
         window.location.reload(false)
@@ -16,14 +17,14 @@ export default({user})=>{
     useEffect(()=>{
 
         socketRef.current = io.connect(socketURL)
-        socketRef.current.emit('new-user', user)
+        socketRef.current.emit('new-user', {user, room})
         socketRef.current.on('error', ()=>refreshPage())
         socketRef.current.on('message', ({messages})=>{
         setChat(messages)
         })
         socketRef.current.on('users-logged-in', (users)=> setUsersLogged({...users}))
         return () => {
-            socketRef.current.emit('disconnect')
+            socketRef.current.emit('disconnect', room)
             socketRef.current.off()
         }
     },[setChat,setData,setUsersLogged,socketURL])
@@ -40,7 +41,7 @@ export default({user})=>{
     const handleSubmitButton = (e) =>{
         e.preventDefault()
         const {name, msg} = data
-        socketRef.current.emit('message', {name, msg})
+        socketRef.current.emit('message', {name, msg, room})
         setData({...data, msg:''})
     }
 

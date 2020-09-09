@@ -106,20 +106,20 @@ app.get('/room',async (req,res)=>{
     */
     let runSockets = c => {
             io.on('connect', socket =>{
-
                         /* 
                         * Socket runs when 'message' is received
                         * push message into DB and emit 'message' to client
                         *@param name {String} name of the user
                         *@param msg {String} message of the user
                         */
-                        socket.on('message', ({name,msg}) =>{
+                       
+                        socket.on('message', ({name,msg, room}) =>{
                             Chat.findByIdAndUpdate(
                                 {_id:c._id}, 
                                 {$push:{messages:{data:{message:msg, name:name}}}}, 
                                 {new:true})
                             .then(chat=>{
-                                io.emit('message', chat)
+                                io.in(room).emit('message', chat)
                             })
                             .catch(e=>console.log(e))
                             })
@@ -131,27 +131,28 @@ app.get('/room',async (req,res)=>{
                         * else create the user in the DB and emit 'new-user'
                         *@param name {String} name of the user
                         */
-                        socket.on('new-user', (name)=>{
+                        socket.on('new-user', ({room, user})=>{
                             //implement password auth
-                            User.findOne({user:name})
+                            socket.join(room)
+                            User.findOne({user:user})
                             .then(u=>{
                                 if(!u){
-                                    users[socket.id] = name    
-                                    User.create({user:name})
+                                    users[socket.id] = user    
+                                    User.create({user:user})
                                     Chat.findByIdAndUpdate(
                                         {_id:c._id}, 
-                                        {$push:{messages:{data:{message:" has connected!", name:name}}}}, 
+                                        {$push:{messages:{data:{message:" has connected!", name:user}}}}, 
                                         {new:true})
                                     .then(chat=>{
-                                        io.emit('message', chat)
-                                        io.emit('users-logged-in', users)
+                                        io.in(room).emit('message', chat)
+                                        io.in(room).emit('users-logged-in', users)
                                     })
                                     .catch(e=>console.log(e))
                                     // io.emit('new-user', users[socket.id])
                                     console.log('new user')
                                     }
                                 else
-                                    io.emit('error', 'User taken!')
+                                    io.to(room).emit('error', 'User taken!')
                                 })
                             })
 
@@ -159,15 +160,15 @@ app.get('/room',async (req,res)=>{
                         * Socket runs when 'disconnect' is received
                         * emit 'disconnect'
                         */
-                        socket.on('disconnect', ()=>{
+                        socket.on('disconnect', (room)=>{
                             if(users[socket.id])
                             Chat.findByIdAndUpdate(
                                 {_id:c._id}, 
                                 {$push:{messages:{data:{message:" has disconnected!", name:users[socket.id]}}}}, 
                                 {new:true})
                             .then(chat=>{
-                                io.emit('message', chat)
-                                io.emit('users-logged-in', users)
+                                io.to(room).emit('message', chat)
+                                io.to(room).emit('users-logged-in', users)
                             })
                             .catch(e=>console.log(e))
                             // io.emit('disconnect', (users[socket.id]))
