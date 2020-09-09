@@ -79,6 +79,10 @@ export default({user})=>{
             return <a 
             key={i} 
             href={`${socketURL}/room?user1=${usersLogged[u]}&user2=${usersLogged[socketRef.current.id]}`}>{usersLogged[u]}
+            {/* instead of going to localhost:4000, go to another frontend route, send the user1 and user2 and emit a join command,
+            on join, check user1 and user2 if in DB,
+            https://www.youtube.com/watch?v=ZwFA3YMfkoc
+            */}
             </a>
         })}
       
