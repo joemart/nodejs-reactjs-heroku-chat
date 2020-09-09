@@ -20,14 +20,19 @@ export default({user})=>{
         socketRef.current.emit('new-user', {user, room})
         socketRef.current.on('error', ()=>refreshPage())
         socketRef.current.on('message', ({messages})=>{
+        console.log(messages)
         setChat(messages)
         })
-        socketRef.current.on('users-logged-in', (users)=> setUsersLogged({...users}))
+        socketRef.current.on('users-logged-in', (users)=> {
+            console.log(users)
+            setUsersLogged({...users})
+        })
+        socketRef.current.on('DC', (data)=>console.log(data))
         return () => {
             socketRef.current.emit('disconnect', room)
-            socketRef.current.off()
+            // socketRef.current.off()
         }
-    },[setChat,setData,setUsersLogged,socketURL])
+    },[])
 
 
     const renderChat = () =>{
@@ -35,6 +40,28 @@ export default({user})=>{
         return  chat.map( (d, i) => {
         return userChat(d,i)
             })
+    }
+
+    const renderUsers = () =>{
+        return <div>
+
+        {Object.keys(usersLogged).map((u,i)=>{
+            // console.log(usersLogged)
+            if(u !== socketRef.current.id)
+            return <a 
+            key={i} 
+            href={`${socketURL}/room?user1=${usersLogged[u]}&user2=${usersLogged[socketRef.current.id]}`}>{usersLogged[u]}
+            {/* instead of going to localhost:4000, go to another frontend route, send the user1 and user2 and emit a join command,
+            on join, check user1 and user2 if in DB,
+            https://www.youtube.com/watch?v=ZwFA3YMfkoc
+            */}
+            </a>
+        })}
+      
+        
+        <button onClick={()=>returnSocket(socketRef.current)}>Return socket</button>
+
+    </div>
     }
 
 
@@ -70,28 +97,8 @@ export default({user})=>{
 
     return <>
     
-    <div>
 
-        
-        {/* Need to select the 'this' hook to add it to the parameters */}
-        {Object.keys(usersLogged).map((u,i)=>{
-            // console.log(usersLogged)
-            if(u !== socketRef.current.id)
-            return <a 
-            key={i} 
-            href={`${socketURL}/room?user1=${usersLogged[u]}&user2=${usersLogged[socketRef.current.id]}`}>{usersLogged[u]}
-            {/* instead of going to localhost:4000, go to another frontend route, send the user1 and user2 and emit a join command,
-            on join, check user1 and user2 if in DB,
-            https://www.youtube.com/watch?v=ZwFA3YMfkoc
-            */}
-            </a>
-        })}
-      
-        
-        <button onClick={()=>returnSocket(socketRef.current)}>Return socket</button>
-
-    </div>
-        
+        {renderUsers()}
         {chatForm()}
         {renderChat()}
      </>

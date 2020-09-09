@@ -152,7 +152,7 @@ app.get('/room',async (req,res)=>{
                                     console.log('new user')
                                     }
                                 else
-                                    io.to(room).emit('error', 'User taken!')
+                                    io.to(socket.id).emit('error', 'User taken!')
                                 })
                             })
 
@@ -167,12 +167,14 @@ app.get('/room',async (req,res)=>{
                                 {$push:{messages:{data:{message:" has disconnected!", name:users[socket.id]}}}}, 
                                 {new:true})
                             .then(chat=>{
-                                io.to(room).emit('message', chat)
-                                io.to(room).emit('users-logged-in', users)
+                                io.in(room).emit('message', chat)
+                                console.log(users[socket.id] + ' disconnected')
+                                delete users[socket.id]
+                                io.in(room).emit('users-logged-in', users)
+                                console.log('users-logged-in fired on disconnect')
                             })
                             .catch(e=>console.log(e))
-                            // io.emit('disconnect', (users[socket.id]))
-                            delete users[socket.id]
+
                             })
                     })
                 
